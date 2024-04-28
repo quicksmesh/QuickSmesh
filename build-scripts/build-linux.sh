@@ -4,9 +4,9 @@
 
 mkdir -p temp
 
-# Set front end build environment variables
-QUICKSMESH_VERSION=$1
-SPACEMESH_VERSION=$2
+# Set frontend build environment variables
+export QUICKSMESH_VERSION=$1
+export SPACEMESH_VERSION=$2
 
 # Build frontend
 yarn --cwd ../frontend install

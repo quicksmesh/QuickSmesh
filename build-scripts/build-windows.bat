@@ -4,7 +4,7 @@ REM USAGE: ./build-windows.bat <quicksmesh version> <go-spacemesh version>
 
 mkdir temp
 
-REM Set front end build environment variables
+REM Set frontend build environment variables
 set "QUICKSMESH_VERSION=%1"
 set "SPACEMESH_VERSION=%2"
 
