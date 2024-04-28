@@ -10,7 +10,7 @@ To run the backend you will need Python 3.10 and have installed the following pa
 
 ## Usage
 
-To run the backend and host the front end at the same time run:
+To run the backend and host the frontend at the same time run:
 
     python3 quicksmesh.py --frontend-dir <path/to/dist>
 
