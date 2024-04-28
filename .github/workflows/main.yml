@@ -1,0 +1,61 @@
+name: Standalone Build
+
+on:
+  workflow_dispatch:
+    inputs:
+      quicksmesh_version:
+        description: "quickmesh version"
+        required: true
+      spacemesh_version:
+        description: "go-spacemesh version"
+        required: true
+      build_os:
+        description: "Operating system to build for"
+        required: true
+        type: choice
+        options:
+          - windows
+          - ubuntu
+
+jobs:
+  build:
+    runs-on: ${{ github.event.inputs.build_os }}-latest
+    defaults:
+      run:
+        working-directory: ./build-scripts
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.10"
+
+      - name: Install global node packages
+        run: npm install -g yarn vite
+
+      - name: Install pip dependencies
+        run: pip install -r requirements.txt
+
+      - name: Run Windows build script
+        if: ${{ github.event.inputs.build_os == 'windows' }}
+        run: ./build-windows.bat ${{ github.event.inputs.quicksmesh_version }} ${{ github.event.inputs.spacemesh_version }}
+
+      - name: Run Ubuntu build script
+        if: ${{ github.event.inputs.build_os == 'ubuntu' }}
+        run: |
+          chmod +x ./build-linux.sh
+          ./build-linux.sh ${{ github.event.inputs.quicksmesh_version }} ${{ github.event.inputs.spacemesh_version }}
+
+      - name: Upload a Build Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: quicksmesh-${{ github.event.inputs.quicksmesh_version }}-${{ github.event.inputs.build_os }}-sm-${{ github.event.inputs.spacemesh_version }}
+          path: build-scripts/dist
