@@ -1,4 +1,5 @@
-name: Standalone Build
+name: Build Release
+run-name: quicksmesh-${{ inputs.quicksmesh_version }}-${{ inputs.build_os }}-sm-${{ inputs.spacemesh_version }}
 
 on:
   workflow_dispatch:
@@ -19,7 +20,7 @@ on:
 
 jobs:
   build:
-    runs-on: ${{ github.event.inputs.build_os }}-latest
+    runs-on: ${{ inputs.build_os }}-latest
     defaults:
       run:
         working-directory: ./build-scripts
@@ -27,6 +28,8 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.quicksmesh_version }}
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
@@ -45,17 +48,17 @@ jobs:
         run: pip install -r requirements.txt
 
       - name: Run Windows build script
-        if: ${{ github.event.inputs.build_os == 'windows' }}
-        run: ./build-windows.bat ${{ github.event.inputs.quicksmesh_version }} ${{ github.event.inputs.spacemesh_version }}
+        if: ${{ inputs.build_os == 'windows' }}
+        run: ./build-windows.bat ${{ inputs.quicksmesh_version }} ${{ inputs.spacemesh_version }}
 
       - name: Run Ubuntu build script
-        if: ${{ github.event.inputs.build_os == 'ubuntu' }}
+        if: ${{ inputs.build_os == 'ubuntu' }}
         run: |
           chmod +x ./build-linux.sh
-          ./build-linux.sh ${{ github.event.inputs.quicksmesh_version }} ${{ github.event.inputs.spacemesh_version }}
+          ./build-linux.sh ${{ inputs.quicksmesh_version }} ${{ inputs.spacemesh_version }}
 
       - name: Upload a Build Artifact
         uses: actions/upload-artifact@v4
         with:
-          name: quicksmesh-${{ github.event.inputs.quicksmesh_version }}-${{ github.event.inputs.build_os }}-sm-${{ github.event.inputs.spacemesh_version }}
+          name: quicksmesh-${{ inputs.quicksmesh_version }}-${{ inputs.build_os }}-sm-${{ inputs.spacemesh_version }}
           path: build-scripts/dist
