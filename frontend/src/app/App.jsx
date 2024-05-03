@@ -17,6 +17,11 @@ import {
   Snackbar,
 } from "@mui/material";
 
+import "@fontsource/roboto/300.css";
+import "@fontsource/roboto/400.css";
+import "@fontsource/roboto/500.css";
+import "@fontsource/roboto/700.css";
+
 import ProcessList from "./ProcessList";
 import ProcessConfig from "./ProcessConfig";
 import { SpacemeshArgList, PostServiceArgList } from "../ArgumentLists"; // Adjust the path as necessary
@@ -34,7 +39,7 @@ function App() {
       .then((response) => response.json())
       .then((data) => {
         const latestVersion = data.tag_name;
-        if (latestVersion && latestVersion !== currentVersion) {
+        if (latestVersion && latestVersion.startsWith(currentVersion)) {
           setUpdateAvailable(true);
         } else {
           setUpdateAvailable(false);
