@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import CssBaseline from "@mui/material/CssBaseline";
 import {
   Paper,
@@ -14,7 +14,6 @@ import {
   AlertTitle,
   Button,
   Link,
-  Snackbar,
 } from "@mui/material";
 
 import "@fontsource/roboto/300.css";
@@ -24,13 +23,15 @@ import "@fontsource/roboto/700.css";
 
 import ProcessList from "./ProcessList";
 import ProcessConfig from "./ProcessConfig";
+import NotificationSnackbar from "./NotificationSnackbar";
+import { createNotification } from "../redux/notificationsSlice";
 import { SpacemeshArgList, PostServiceArgList } from "../ArgumentLists"; // Adjust the path as necessary
 
 function App() {
+  const dispatch = useDispatch();
   const websocket = useSelector((state) => state.websocket);
   const [selectedTab, setSelectedTab] = useState(0);
 
-  const [updateAvailable, setUpdateAvailable] = useState(false);
   const currentVersion = process.env.QUICKSMESH_VERSION;
 
   // Get latest release version
@@ -39,38 +40,29 @@ function App() {
       .then((response) => response.json())
       .then((data) => {
         const latestVersion = data.tag_name;
-        if (latestVersion && latestVersion.startsWith(currentVersion)) {
-          setUpdateAvailable(true);
-        } else {
-          setUpdateAvailable(false);
+        if (latestVersion && !latestVersion.startsWith(currentVersion)) {
+          dispatch(
+            createNotification({
+              message: "Update available! ",
+              type: "info",
+              link: {
+                text: "Download the latest version.",
+                href: "https://github.com/quicksmesh/QuickSmesh/releases/latest",
+              },
+            })
+          );
         }
       })
       .catch((error) => {
         console.log("Error fetching latest release:", error);
       });
-  }, [currentVersion]);
+  }, [dispatch, currentVersion]);
 
   return (
     <>
       <CssBaseline enableColorScheme />
-      <Snackbar open={updateAvailable}>
-        <Alert
-          onClose={() => {
-            setUpdateAvailable(false);
-          }}
-          severity="info"
-          variant="filled"
-        >
-          {"Update available! "}
-          <Link
-            color="inherit"
-            href="https://github.com/quicksmesh/QuickSmesh/releases/latest"
-            target="_blank"
-          >
-            Download the latest version.
-          </Link>
-        </Alert>
-      </Snackbar>
+
+      <NotificationSnackbar />
       <Backdrop
         sx={{ color: "#fff", zIndex: (theme) => theme.zIndex.drawer + 1 }}
         open={!websocket.connected}
