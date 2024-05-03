@@ -1,5 +1,6 @@
 import { updateProcesses } from "./redux/processSlice";
 import { setConnected } from "./redux/websocketSlice";
+import { createNotification } from "./redux/notificationsSlice";
 
 import store from "./redux/store";
 
@@ -45,6 +46,10 @@ function handleIncoming(message) {
   switch (message?.action) {
     case "updateProcesses": {
       store.dispatch(updateProcesses(message.payload));
+      break;
+    }
+    case "createNotification": {
+      store.dispatch(createNotification(message.payload));
       break;
     }
     default: {

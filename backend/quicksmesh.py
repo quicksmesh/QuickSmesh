@@ -111,7 +111,14 @@ class QuickSmesh:
         print(f"Running: {command}")
 
         # Create process
-        proc = subprocess.Popen(shlex.split(command), stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True)
+        try:
+            proc = subprocess.Popen(shlex.split(command), stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True)
+        except Exception as e:
+            # Send any errors to frontend
+            print(e)
+            message = json.dumps({"action": "createNotification", "payload": {"type": "error", "message": str(e)}})
+            self.ws_send(message)
+            return
 
         # Create process entry
         with self.update_processes_context():
