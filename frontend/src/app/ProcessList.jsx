@@ -18,7 +18,7 @@ import {
 } from "@mui/material";
 
 import ConsoleOutput from "./ConsoleOutput";
-import { websocketSend } from "../WebSocketConnect";
+import { websocketSend } from "../WebSocket";
 import { hideProcess } from "../redux/processSlice";
 /* chatGPT prompt:
 Using modern material ui (mui) write a component called ProcessList which creates a mui Stack of ProcessRow components each row displays the process's tag, pid and args, when the row is expanded the process logs are displayed. 
