@@ -19,7 +19,7 @@ import {
 } from "@mui/material";
 
 import { convertArgsToString } from "../helpers";
-import { websocketSend } from "../WebSocketConnect";
+import { websocketSend } from "../WebSocket";
 
 const ArgRow = ({
   arg,
