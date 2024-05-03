@@ -47,7 +47,9 @@ class QuickSmesh:
         if command == "run":
             self.run(message["tag"], message["cmd"])
         elif command == "terminate":
-            self.terminate_pid(message["pid"])
+            self.terminate_process_by_pid(message["pid"])
+        elif command == "remove":
+            self.remove_process_by_pid(message["pid"])
         elif command == "check_post_service":
             # Work in progress
             (node_ids, post_id, post_id_exists) = self.check_post_service(m["post_dir"], m["node_dir"])
@@ -121,19 +123,18 @@ class QuickSmesh:
         print(f"Process started: {proc.pid}")
         self.send_update_processes()
 
-    def terminate_pid(self, pid):
+    def terminate_process_by_pid(self, pid):
         '''
         Terminate a running process based on its PID
         '''
-        found = False
         for proc in self._processes.keys():
             if str(proc.pid) == str(pid):
                 found = True
                 self.terminate_process(proc)
+                self.send_update_processes()
+                break
 
-        if found:
-            self.send_update_processes()
-        else:
+        if not found:
             print(f"Failed to find process with PID: {pid}")
 
     def terminate_process(self, proc):
@@ -152,6 +153,27 @@ class QuickSmesh:
             with self.update_processes_context():
                 self._processes[proc]["ended"] = True
                 self._processes[proc]["stdout"] += "\nPROCESS TERMINATED BY APPLICATION"
+
+    def remove_process_by_pid(self, pid):
+        '''
+        Remove a killed process from the process list
+        '''
+        print(f"removing {pid}")
+        found = False
+        for proc in self._processes.keys():
+            if str(proc.pid) == str(pid):
+                if self._processes[proc]["ended"] == True:
+                    found = True
+                    with self.update_processes_context():
+                        self._processes.pop(proc)
+                    self.send_update_processes()
+                    print(f"Process {pid} removed")
+                    break
+                else:
+                    print(f"Failed to remove process {pid}, still running")
+
+        if not found:
+            print(f"Failed to find process with PID: {pid}")
 
     def check_post_service(self, post_dir, node_dir):
         '''
