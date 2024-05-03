@@ -19,7 +19,6 @@ import {
 
 import ConsoleOutput from "./ConsoleOutput";
 import { websocketSend } from "../WebSocket";
-import { hideProcess } from "../redux/processSlice";
 /* chatGPT prompt:
 Using modern material ui (mui) write a component called ProcessList which creates a mui Stack of ProcessRow components each row displays the process's tag, pid and args, when the row is expanded the process logs are displayed. 
 ProcessRow should have props: tag, pid, cmd, stdout (all of which are strings)
@@ -27,7 +26,7 @@ ProcessTable should have a single prop called processes in the form [{pid: "pid1
 */
 
 // ProcessRow component
-const ProcessRow = ({ tag, pid, cmd, stdout, ended, hideCallback }) => {
+const ProcessRow = ({ tag, pid, cmd, stdout, ended, deleteCallback }) => {
   const [expanded, setExpanded] = useState(false);
 
   const handleExpandClick = () => {
@@ -58,7 +57,7 @@ const ProcessRow = ({ tag, pid, cmd, stdout, ended, hideCallback }) => {
         {ended && (
           <IconButton
             onClick={() => {
-              hideCallback(pid);
+              deleteCallback(pid);
             }}
           >
             <DeleteIcon />
@@ -108,26 +107,23 @@ const ProcessRow = ({ tag, pid, cmd, stdout, ended, hideCallback }) => {
 
 // ProcessList component
 const ProcessList = () => {
-  const dispatch = useDispatch();
   const processes = useSelector((state) => state.processes);
+
+  const RemoveProcessCallback = (pid) => {
+    websocketSend({ command: "remove", pid });
+  };
 
   return (
     <Stack spacing={2}>
-      {processes.active.map((process, index) => {
-        if (processes.hidden.includes(process.pid)) {
-          return null;
-        } else {
-          return (
-            <ProcessRow
-              key={index}
-              {...process}
-              hideCallback={(pid) => {
-                dispatch(hideProcess(pid));
-              }}
-            />
-          );
-        }
-      })}
+      {processes.map((process, index) => (
+        <ProcessRow
+          key={index}
+          {...process}
+          deleteCallback={(pid) => {
+            RemoveProcessCallback(pid);
+          }}
+        />
+      ))}
     </Stack>
   );
 };

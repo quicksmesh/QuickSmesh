@@ -5,36 +5,28 @@ export const processSlice = createSlice({
   /** Example
   [{
       "pid": 1234
-      "tag": "go-spacemesh"
-      "args": "go-spacemesh.exe --stuff"
-      "stdout": "logs"
+      "cmd": "go-spacemesh.exe --stuff",
+      "tag": "Spacemesh node",
+      "stdout": "logs...",
+      "ended": true
     },
     {
       "pid" 9876
-      "tag": "go-service"
-      "args": "go-service.exe --stuff"
-      "stdout": "logs"
+      "cmd": "go-service.exe --stuff",
+      "tag": "PoST Service",
+      "stdout": "logs...",
+      "ended": false
     }
   ]
   */
-  initialState: {
-    active: [],
-    hidden: [],
-  },
+  initialState: [],
   reducers: {
     updateProcesses: (state, action) => {
-      if (action.payload.length === 0) {
-        state.active = action.payload;
-      } else {
-        Object.assign(state.active, action.payload);
-      }
-    },
-    hideProcess: (state, action) => {
-      const pid = action.payload;
-      state.hidden.push(pid);
+      // Action payload always contains list of current processes
+      return action.payload;
     },
   },
 });
 
-export const { updateProcesses, hideProcess } = processSlice.actions;
+export const { updateProcesses } = processSlice.actions;
 export default processSlice.reducer;
