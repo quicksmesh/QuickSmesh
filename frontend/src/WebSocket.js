@@ -1,5 +1,5 @@
 import { updateProcesses } from "./redux/processSlice";
-import { setConnected } from "./redux/webscoketSlice";
+import { setConnected } from "./redux/websocketSlice";
 
 import store from "./redux/store";
 
