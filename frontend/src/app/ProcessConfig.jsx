@@ -20,27 +20,21 @@ import {
 
 import { convertArgsToString } from "../helpers";
 import { websocketSend } from "../WebSocket";
+import { useDispatch, useSelector } from "react-redux";
+import { setArg } from "../redux/ArgsSlice";
 
-const ArgRow = ({
-  arg,
-  display,
-  info,
-  defaultValue,
-  disabled,
-  args,
-  setArgs,
-}) => {
+const ArgRow = ({ displayName, argValue, info, disabled, setArgValue }) => {
   return (
     <Box sx={{ display: "flex", alignItems: "flex-end" }}>
       <Tooltip title={info} placement="right">
         <InfoIcon sx={{ mr: 1, my: 2 }} />
       </Tooltip>
       <TextField
-        label={display}
+        label={displayName}
         fullWidth
-        value={args[arg]}
+        value={argValue}
         onChange={(e) => {
-          setArgs({ ...args, [arg]: e.target.value });
+          setArgValue(e.target.value);
         }}
         disabled={disabled}
       />
@@ -53,33 +47,22 @@ const ArgRow = ({
   );
 };
 
-const ProcessConfig = ({ argList, tag, title }) => {
-  // Convert argList to state object
-  const initialState = argList.reduce((acc, item) => {
-    acc[item.arg] = item.defaultValue;
-    return acc;
-  }, {});
+const ProcessConfig = ({ tag, title, children }) => {
+  const dispatch = useDispatch();
 
-  const [args, setArgs] = useState(initialState);
   const [cmdString, setCmdString] = useState("");
   const [advancedExpanded, setAdvancedExpanded] = useState(false);
   const [editEnabled, setEditEnabled] = useState(false);
-
-  // Split arg list into advanced and non advanced
-  const advancedArgList = [];
-  const nonAdvancedArgList = [];
-  argList.forEach((item) => {
-    if (item.advanced) {
-      advancedArgList.push(item);
-    } else {
-      nonAdvancedArgList.push(item);
-    }
-  });
+  const args = useSelector((state) => state.args[tag]);
 
   // Update cmdString every time args change
   useEffect(() => {
     setCmdString(convertArgsToString(args));
   }, [args]);
+
+  const setArgValue = (arg, value) => {
+    dispatch(setArg({ tag, arg, value }));
+  };
 
   const handleButtonClick = () => {
     websocketSend({ command: "run", tag: tag, cmd: cmdString });
@@ -96,18 +79,19 @@ const ProcessConfig = ({ argList, tag, title }) => {
           <Typography variant="h6">{title}</Typography>
           <Divider sx={{ my: 1 }} />
         </Grid>
-        {argList.map(
-          (item, index) =>
+        {Object.entries(args).map(
+          ([key, item]) =>
             !item.advanced && (
-              <Grid key={index} item xs={11}>
+              <Grid key={key} item xs={12}>
                 <ArgRow
-                  arg={item.arg}
-                  display={item.display}
+                  displayName={item.display}
+                  argValue={item.value}
                   info={item.info}
-                  defaultValue={item.defaultValue}
                   disabled={editEnabled}
                   args={args}
-                  setArgs={setArgs}
+                  setArgValue={(val) => {
+                    setArgValue(key, val);
+                  }}
                 />
               </Grid>
             )
@@ -129,18 +113,19 @@ const ProcessConfig = ({ argList, tag, title }) => {
         <Grid item xs={12}>
           <Collapse in={advancedExpanded} timeout="auto" unmountOnExit>
             <Grid container spacing={2}>
-              {argList.map(
-                (item, index) =>
+              {Object.entries(args).map(
+                ([key, item]) =>
                   item.advanced && (
-                    <Grid key={index} item xs={11}>
+                    <Grid key={key} item xs={12}>
                       <ArgRow
-                        arg={item.arg}
-                        display={item.display}
+                        displayName={item.display}
+                        argValue={item.value}
                         info={item.info}
-                        defaultValue={item.defaultValue}
                         disabled={editEnabled}
                         args={args}
-                        setArgs={setArgs}
+                        setArgValue={(val) => {
+                          setArgValue(key, val);
+                        }}
                       />
                     </Grid>
                   )
@@ -148,7 +133,11 @@ const ProcessConfig = ({ argList, tag, title }) => {
             </Grid>
           </Collapse>
         </Grid>
-
+        {children && (
+          <Grid item xs={12}>
+            {children}
+          </Grid>
+        )}
         <Grid item xs={10}>
           <Box sx={{ display: "flex", alignItems: "flex-end" }}>
             <IconButton

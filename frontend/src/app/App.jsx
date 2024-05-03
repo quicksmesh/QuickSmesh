@@ -25,7 +25,7 @@ import ProcessList from "./ProcessList";
 import ProcessConfig from "./ProcessConfig";
 import NotificationSnackbar from "./NotificationSnackbar";
 import { createNotification } from "../redux/notificationsSlice";
-import { SpacemeshArgList, PostServiceArgList } from "../ArgumentLists"; // Adjust the path as necessary
+import { websocketSend } from "../WebSocket";
 
 function App() {
   const dispatch = useDispatch();
@@ -101,17 +101,20 @@ function App() {
               </Box>
               {selectedTab === 0 && (
                 <ProcessConfig
-                  argList={SpacemeshArgList}
-                  tag="Spacemesh node"
+                  tag="go-spacemesh"
                   title="Configure Spacemesh Node"
-                />
+                ></ProcessConfig>
               )}
               {selectedTab === 1 && (
-                <ProcessConfig
-                  argList={PostServiceArgList}
-                  tag="PoST Service"
-                  title="Configure PoST Service"
-                />
+                <ProcessConfig tag="service" title="Configure PoST Service">
+                  {/* <Button
+                    onClick={() => {
+                      websocketSend({ command: "check_post_service" });
+                    }}
+                  >
+                    configure
+                  </Button> */}
+                </ProcessConfig>
               )}
               {selectedTab === 2 && (
                 <Box
