@@ -109,10 +109,14 @@ function App() {
                 <ProcessConfig tag="service" title="Configure PoST Service">
                   {/* <Button
                     onClick={() => {
-                      websocketSend({ command: "check_post_service" });
+                      websocketSend({
+                        command: "check_post_service",
+                        post_dir: "C:/quicksmesh/post-data",
+                        node_dir: "C:/quicksmesh/node-data",
+                      });
                     }}
                   >
-                    configure
+                    Check identities
                   </Button> */}
                 </ProcessConfig>
               )}
