@@ -52,7 +52,7 @@ class QuickSmesh:
             self.remove_process_by_pid(message["pid"])
         elif command == "check_post_service":
             # Work in progress
-            (node_ids, post_id, post_id_exists) = self.check_post_service(m["post_dir"], m["node_dir"])
+            (node_ids, post_id, post_id_exists) = self.check_post_service(message["post_dir"], message["node_dir"])
             payload = {"nodeIds": node_ids, "postId": post_id, "exists": post_id_exists}
             message = json.dumps({"action": "updatePostServiceState", "payload": payload})
             self.ws_send(message)
@@ -198,7 +198,7 @@ class QuickSmesh:
                     data = f.read()
                     node_ids.append({"file": filename, "key": data[:63], "id": data[64:]})
 
-        # Get post id
+        # Get post id from postdata_metadata.json
         post_metadata_path = os.path.join(post_dir, "postdata_metadata.json")
         with open(post_metadata_path) as f:
             metadata = json.loads(f.read())

@@ -41,7 +41,7 @@ export const ServiceDefaultArgs = {
   dir: {
     display: "PoST data folder",
     info: "Path to PoST data folder containing your initialized data, make sure to copy the identity.key file into your node's identities folder",
-    value: "C:/spacemesh/post-data",
+    value: "C:/quicksmesh/post-data",
     advanced: false,
   },
   threads: {
